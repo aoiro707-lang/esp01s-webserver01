@@ -1,6 +1,7 @@
 services:
   - type: web
-    name: esp01s-webserver
+    name: esp01s-webserver01
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
+
