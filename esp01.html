@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP01S Control Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>ESP01S CONTROL PANEL</h2>
+
+<p id="wifi">WiFi: --</p>
+<p id="relay">Relay: --</p>
+
+<button onclick="setRelay('ON')">BẬT RELAY</button>
+<button onclick="setRelay('OFF')">TẮT RELAY</button>
+
+<script>
+const SERVER = "https://esp01-server.onrender.com";
+
+// ===== CẬP NHẬT TRẠNG THÁI =====
+function updateStatus() {
+  fetch(SERVER + "/status?t=" + Date.now())
+    .then(response => {
+      if (!response.ok) throw new Error("HTTP error");
+      return response.json();
+    })
+    .then(data => {
+      // JSON ĐÚNG:
+      // { online: true, state: "OFF", wifi: "Vinatoken_UCO" }
+
+      if (data.online === true) {
+        document.getElementById("wifi").innerText =
+          "WiFi: Đã kết nối (" + data.wifi + ")";
+      } else {
+        document.getElementById("wifi").innerText =
+          "WiFi: Chưa kết nối";
+      }
+
+      document.getElementById("relay").innerText =
+        "Relay: " + data.state;
+    })
+    .catch(err => {
+      document.getElementById("wifi").innerText =
+        "WiFi: Lỗi kết nối server";
+      console.error(err);
+    });
+}
+
+// ===== GỬI LỆNH RELAY =====
+function setRelay(state) {
+  fetch(SERVER + "/relay?state=" + state + "&t=" + Date.now())
+    .then(() => updateStatus());
+}
+
+// ===== AUTO REFRESH =====
+setInterval(updateStatus, 2000);
+updateStatus();
+</script>
+
+</body>
+</html>
