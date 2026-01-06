@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESP01S Control</title>
+
+<style>
+body { font-family: Arial; background: #f2f2f2; }
+.container { max-width: 400px; margin: auto; padding: 20px; }
+.card { background: white; padding: 20px; border-radius: 12px; }
+button { width: 100%; padding: 15px; margin-top: 10px; font-size: 18px; }
+.btn-on { background: green; color: white; }
+.btn-off { background: red; color: white; }
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="card">
+    <h2>ESP01S WiFi Relay</h2>
+    <div id="wifi">WiFi: --</div>
+    <div id="relay">Relay: --</div>
+
+    <button class="btn-on" onclick="setRelay('ON')">BẬT</button>
+    <button class="btn-off" onclick="setRelay('OFF')">TẮT</button>
+  </div>
+</div>
+
+<script>
+function setRelay(state) {
+  fetch("/relay?state=" + state).then(updateStatus);
+}
+
+function updateStatus() {
+  fetch("/status?t=" + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("wifi").innerText =
+        data.online ? "WiFi: Đã kết nối (" + data.wifi + ")" : "WiFi: Mất kết nối";
+      document.getElementById("relay").innerText =
+        "Relay: " + data.state;
+    });
+}
+
+updateStatus();
+setInterval(updateStatus, 2000);
+</script>
+</body>
+</html>
